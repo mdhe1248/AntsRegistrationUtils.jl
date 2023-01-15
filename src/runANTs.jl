@@ -27,7 +27,7 @@ function runAntsRegistrationPairwise(dim, fixedfns, movingfns; tag = false, ants
 		push!(outnames, outname)
 	end
 	for i in eachindex(movingfns)
-    antsRegisterFunc(dim, outnames[i], fixedfns[i], movingfns[i])
+    run(antsRegisterFunc(dim, outnames[i], fixedfns[i], movingfns[i]))
   end
 	return(outnames)
 end
