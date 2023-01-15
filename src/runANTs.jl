@@ -62,7 +62,7 @@ function runAntsTransformsPairwise(fixedfns, movingfns; outfile_tag = false, tfo
 		push!(syntformfns, syntform)
   end
   for i in eachindex(movingfns)
-    if isfile(syntform)
+    if isfile(syntformfns[i])
       run(antsTransformFunc(imgw_outnames[i], fixedfns[i], movingfns[i], tformfns[i], syntformfns[i]))
     else
       run(antsTransformFunc(imgw_outnames[i], fixedfns[i], movingfns[i], tformfns[i]))
