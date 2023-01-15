@@ -58,8 +58,8 @@ function runAntsTransformsPairwise(fixedfns, movingfns; outfile_tag = false, tfo
   	# assign input tform file name
     tform = tform_fn*"0GenericAffine.mat"
 		syntform = tform_fn*"1Warp.nii.gz"
-		push!(tformfns, tfom)
-		push!(syntformfns, tfom)
+		push!(tformfns, tform)
+		push!(syntformfns, tform)
   end
   for i in eachindex(movingfns)
     if isfile(syntform)
