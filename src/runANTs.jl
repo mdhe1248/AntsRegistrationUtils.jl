@@ -36,7 +36,7 @@ end
 """
 Run pairwise transformation. Non-linear warping has not been implemented. 
 """
-function runAntsTransformsPairwise(fixedfns, movingfns; outfile_tag = false, tform_tag = false, antsTransformFunc = runAntsTransform_default)
+function _runAntsTransformPairwise(fixedfns, movingfns; outfile_tag = false, tform_tag = false)
   tformfns = Vector{String}(undef, 0)
   syntformfns = Vector{String}(undef, 0)
   imgw_outnames = Vector{String}(undef, 0)
@@ -61,12 +61,22 @@ function runAntsTransformsPairwise(fixedfns, movingfns; outfile_tag = false, tfo
 		push!(tformfns, tform)
 		push!(syntformfns, syntform)
   end
+	return(imgw_outnames, tformfns, syntformfns)
+end
+
+function runAntsTransformsPairwise(fixedfns, movingfns; outfile_tag = false, tform_tag = false, antsTransformFunc = runAntsTransform_default)
+  imgw_outnames, tformfns, syntformfns = _runAntsTransformPairwise(fixedfns, movingfns; outfile_tag = outfile_tag, tform_tag = tform_tag)
   for i in eachindex(movingfns)
-    if isfile(syntformfns[i])
-      run(antsTransformFunc(imgw_outnames[i], fixedfns[i], movingfns[i], syntformfns[i], tformfns[i]))
-    else
       run(antsTransformFunc(imgw_outnames[i], fixedfns[i], movingfns[i], tformfns[i]))
-    end
   end
   return(imgw_outnames)
 end
+
+function runAntsSyNTransformsPairwise(fixedfns, movingfns; outfile_tag = false, tform_tag = false, antsTransformFunc = runAntsTransform_syn)
+	imgw_outnames, tformfns, syntformfns = _runAntsTransformPairwise(fixedfns, movingfns; outfile_tag = outfile_tag, tform_tag = tform_tag)
+	for i in eachindex(movingfns)
+			run(antsTransformFunc(imgw_outnames[i], fixedfns[i], movingfns[i], syntformfns[i], tformfns[i]))
+	end
+	return(imgw_outnames)
+end
+
