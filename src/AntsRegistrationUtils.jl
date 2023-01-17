@@ -3,7 +3,7 @@ module AntsRegistrationUtils
 using AxisArrays, Unitful
 const μm = u"μm"
 
-export setAxis, runAntsRegistration_default, runAntsTransform_default, runAntsRegistrationPairwise, runAntsTransformsPairwise
+export setAxis, runAntsRegistration_default, runAntsTransform_default, runAntsRegistrationPairwise, runAntsTransformsPairwise, runAntsTransformsPairwiseSyN
 
 include("setaxis.jl")
 include("runANTs.jl")
