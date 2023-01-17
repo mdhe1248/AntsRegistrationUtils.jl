@@ -72,7 +72,7 @@ function runAntsTransformsPairwise(fixedfns, movingfns; outfile_tag = false, tfo
   return(imgw_outnames)
 end
 
-function runAntsSyNTransformsPairwise(fixedfns, movingfns; outfile_tag = false, tform_tag = false, antsTransformFunc = runAntsTransform_syn)
+function runAntsTransformsPairwiseSyN(fixedfns, movingfns; outfile_tag = false, tform_tag = false, antsTransformFunc = runAntsTransform_syn)
 	imgw_outnames, tformfns, syntformfns = _runAntsTransformPairwise(fixedfns, movingfns; outfile_tag = outfile_tag, tform_tag = tform_tag)
 	for i in eachindex(movingfns)
 			run(antsTransformFunc(imgw_outnames[i], fixedfns[i], movingfns[i], syntformfns[i], tformfns[i]))
