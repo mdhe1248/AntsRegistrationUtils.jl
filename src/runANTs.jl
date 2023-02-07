@@ -80,3 +80,29 @@ function runAntsTransformsPairwiseSyN(fixedfns, movingfns; outfile_tag = false, 
 	return(imgw_outnames)
 end
 
+"""
+1. apply the same 2d antsTransformations to each frame of a 3d image (channel image).
+2. save the output file `warpoutfn`
+Must use .nrrd format
+`tform2_fn` is a non-rigid transformation
+`tform1_fn` is a rigid/affine transformation
+"""
+function applyAntsTransforms(warpoutfn, fixedfn, movingfn, tform2_fn, tform1_fn, mv_pxspacing; antsTransformFunc = runAntsTransform_01)
+  img = load(movingfn)
+  nimgs = size(img, 3)
+  tmp = [];
+  for i in 1:nimgs
+    infn = string("/tmp/tmpin_", i, ".nrrd")  #input file
+    imga = setAxis(parent(img[:,:,i]), mv_pxspacing)
+    save(infn, imga) #temporary save
+    outfn = string("/tmp/tmpout_",i, ".nrrd") #output file
+    run(runAntsTransform_01(outfn, fixedfn, infn, tform2_fn, tform1_fn))
+    push!(tmp, load(outfn))
+    rm(infn)
+    rm(outfn)
+  end
+  save(warpoutfn, cat(tmp..., dims = 3))
+end
+
+
+
