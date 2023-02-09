@@ -91,7 +91,7 @@ Must use .nrrd format
 `tform2_fn` is a non-rigid transformation
 `tform1_fn` is a rigid/affine transformation
 """
-function applyAntsTransforms(warpoutfn, fixedfn, movingfn, tform2_fn, tform1_fn, mv_pxspacing; antsTransformFunc = runAntsTransform_default)
+function applyAntsTransforms(warpoutfn, fixedfn, movingfn, tform2_fn, tform1_fn, mv_pxspacing; antsTransformFunc)
   img = load(movingfn)
   nimgs = size(img, 3)
   tmp = [];
