@@ -96,7 +96,7 @@ function applyAntsTransforms(warpoutfn, fixedfn, movingfn, tform2_fn, tform1_fn,
     imga = setAxis(parent(img[:,:,i]), mv_pxspacing)
     save(infn, imga) #temporary save
     outfn = string("/tmp/tmpout_",i, ".nrrd") #output file
-    run(runAntsTransform_01(outfn, fixedfn, infn, tform2_fn, tform1_fn))
+    run(antsTransformFunc(outfn, fixedfn, infn, tform2_fn, tform1_fn))
     push!(tmp, load(outfn))
     rm(infn)
     rm(outfn)
