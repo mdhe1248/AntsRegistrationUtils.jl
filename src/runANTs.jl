@@ -9,9 +9,13 @@ runAntsRegistration_default(dim, outname, f, m) = `antsRegistration -v -d $dim -
 """
 My default registration parameters:
 
-runAntsTransform_default(imgw_outname, f, m, tform) = \`antsApplyTransforms -d 2 -i \$m -r \$f -o \$imgw_outname -n Linear -t \$tform -v 1\`
+runAntsTransform_default(imgw_outname, f, m, tform1) = \`antsApplyTransforms -d 2 -i \$m -r \$f -o \$imgw_outname -n Linear -t \$tform1 -v 1\`
+runAntsTransform_default(imgw_outname, f, m, tform2, tform1) = \`antsApplyTransforms -d 2 -i \$m -r \$f -o \$imgw_outname -n Linear -t \$tform2 \$tform1 -v 1\`
 """
-runAntsTransform_default(imgw_outname, f, m, tform) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t $tform -v 1`
+runAntsTransform_default(imgw_outname, f, m, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t $tform1 -v`
+runAntsTransform_default(imgw_outname, f, m, tform2, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t $tform2 -t $tform1 -v`
+runAntsTransform_inv_default(imgw_outname, f, m, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t \[$tform1, 1\] -v`
+runAntsTransform_inv_default(imgw_outname, f, m, inv_tform2, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t $inv_tform2 -t \[$tform1, 1\] -v`
 
 """ 
 Run Pairwise antsRegistration
@@ -87,7 +91,7 @@ Must use .nrrd format
 `tform2_fn` is a non-rigid transformation
 `tform1_fn` is a rigid/affine transformation
 """
-function applyAntsTransforms(warpoutfn, fixedfn, movingfn, tform2_fn, tform1_fn, mv_pxspacing; antsTransformFunc = runAntsTransform_01)
+function applyAntsTransforms(warpoutfn, fixedfn, movingfn, tform2_fn, tform1_fn, mv_pxspacing; antsTransformFunc = runAntsTransform_default)
   img = load(movingfn)
   nimgs = size(img, 3)
   tmp = [];
@@ -103,6 +107,7 @@ function applyAntsTransforms(warpoutfn, fixedfn, movingfn, tform2_fn, tform1_fn,
   end
   save(warpoutfn, cat(tmp..., dims = 3))
 end
+
 
 
 
