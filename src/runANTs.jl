@@ -55,6 +55,12 @@ runAntsTransform_01(imgw_outname, f, m, tform2, tform1) = `antsApplyTransforms -
 runAntsTransform_inv(imgw_outname, f, m, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t \[$tform1, 1\] -v`
 runAntsTransform_inv(imgw_outname, f, m, inv_tform2, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t $inv_tform2 -t \[$tform1, 1\] -v`
 
+
+""" find an origin to put the image `A` in the center of PaddedView. v is a 2-element vector"""
+function padOrigin(v, A)
+  r, c = (ceil(Int, (v[1]-size(A,1))/2)+1, ceil(Int, (v[2]-size(A,2))/2)+1)
+  return(r, c)
+end
 #"""
 #My default registration parameters:
 #
