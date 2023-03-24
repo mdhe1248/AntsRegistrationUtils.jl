@@ -1,9 +1,9 @@
 module AntsRegistrationUtils
 
-using AxisArrays, Unitful
+using AxisArrays, Unitful, Images
 const μm = u"μm"
 
-export setAxis, runAntsRegistration_default, runAntsRegistrationPairwise, runAntsTransformsPairwise, runAntsTransformsPairwiseSyN, applyAntsTransforms, runAntsTransform_default, runAntsTransform_inv_default
+export setAxis, applyAntsTransforms_01, runAntsRegistration_01, runAntsTransform_01, runAntsTransform_inv 
 include("setaxis.jl")
 include("runANTs.jl")
 
