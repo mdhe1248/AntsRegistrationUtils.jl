@@ -9,6 +9,7 @@ Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
+Images = "0.25"
 julia = "1"
 
 [extras]
