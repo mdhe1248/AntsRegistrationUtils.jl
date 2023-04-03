@@ -2,7 +2,7 @@
 Apply transform to all channels of an image.
 This function will load a 3d tif image (potentially multi channel 2d image), convert it into nrrd, temporarily store it in `/tmp`, apply the same transform to all frames, save the transformed image in `/tmp`, 
 """
-function applyAntsTransforms_01(warpoutfn::String, fixedfn::String, movingfn::String, tform2_fn::String, tform1_fn::String, mv_pxspacing; antsTransformFunc)
+function applyAntsTransforms_01(warpoutfn::String, d::Int, fixedfn::String, movingfn::String, tform2_fn::String, tform1_fn::String, mv_pxspacing; antsTransformFunc)
   img = load(movingfn)
   nimgs = size(img, 3) #find the number of channels
   tmp = Vector{AbstractMatrix}();
@@ -11,7 +11,7 @@ function applyAntsTransforms_01(warpoutfn::String, fixedfn::String, movingfn::St
     imga = setAxis(parent(img[:,:,i]), mv_pxspacing) #read a single channel, set axis
     save(infn, imga) #temporarily save as nrrd
     outfn = string("/tmp/tmpout_",i, ".nrrd") #output nrrd file
-    run(antsTransformFunc(outfn, fixedfn, infn, tform2_fn, tform1_fn)) #run transform
+    run(antsTransformFunc(outfn, d, fixedfn, infn, tform2_fn, tform1_fn)) #run transform
     push!(tmp, load(outfn))
     rm(infn)
     rm(outfn)
@@ -45,15 +45,15 @@ runAntsRegistration_01(dim, outname, f, m; winsorizor = (0.001, 0.99), SyN_thres
 `tform1` affine transformation ants file.
 `tform2` warp ants file.
 """
-runAntsTransform_01(imgw_outname, f, m, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t $tform1 -v`
-runAntsTransform_01(imgw_outname, f, m, tform2, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t $tform2 -t $tform1 -v`
+runAntsTransform_01(imgw_outname, d, f, m, tform1) = `antsApplyTransforms -d $d -i $m -r $f -o $imgw_outname -n Linear -t $tform1 -v`
+runAntsTransform_01(imgw_outname, d, f, m, tform2, tform1) = `antsApplyTransforms -d $d -i $m -r $f -o $imgw_outname -n Linear -t $tform2 -t $tform1 -v`
 
 """Transformation function
 `tform1` affine transformation ants file.
 `inv_tform2` inverse warp ants file.
 """
-runAntsTransform_inv(imgw_outname, f, m, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t \[$tform1, 1\] -v`
-runAntsTransform_inv(imgw_outname, f, m, inv_tform2, tform1) = `antsApplyTransforms -d 2 -i $m -r $f -o $imgw_outname -n Linear -t $inv_tform2 -t \[$tform1, 1\] -v`
+runAntsTransform_inv(imgw_outname, d, f, m, tform1) = `antsApplyTransforms -d $d -i $m -r $f -o $imgw_outname -n Linear -t \[$tform1, 1\] -v`
+runAntsTransform_inv(imgw_outname, d, f, m, inv_tform2, tform1) = `antsApplyTransforms -d $d -i $m -r $f -o $imgw_outname -n Linear -t $inv_tform2 -t \[$tform1, 1\] -v`
 
 
 """ find an origin to put the image `A` in the center of PaddedView. v is a 2-element vector"""
