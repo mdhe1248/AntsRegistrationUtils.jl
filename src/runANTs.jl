@@ -69,7 +69,7 @@ end
 
 function overlay_boundary(img, attnimg, clim)
   tmp = annotation_boundary(attnimg)
-  scalefun = scaleminmax(clim) #contrast
+  scalefun = scaleminmax(clim...) #contrast
   boundaryimg = scalefun.(img)
   boundaryimg[tmp .== 1] .= 1
   return(boundaryimg)
