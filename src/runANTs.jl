@@ -1,3 +1,92 @@
+mutable struct Regvars
+  fixed2d_fn::String
+  annotation2d_fn::String
+  moving2d_fn::String
+  warpoutfn::String #all channel
+  tag::String
+  dim::Int
+  mv_pxspacing::NTuple{2, Number}
+  winsorizor::NTuple{2, Float64}
+  SyN_thresh::Float64
+  inverse_warp_fn::String
+  tform1_fn::String
+  tform2_fn::String
+  warpedfn::String #single moving channel
+  fixedinvfn::String
+  attninvfn::String
+end
+Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpout, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
+) = Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpout, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
+  string(tag, "1InverseWarp.nii.gz"),
+  string(tag, "0GenericAffine.mat"),
+  string(tag, "1Warp.nii.gz"),
+  string(tag, "warped.nrrd"),
+  string(tag, "fixedinv.nrrd"),
+  string(tag, "attninv.nrrd"))
+
+
+## assign input and output file names 
+function assign_regvars(outdir, movingfns, slices, channel, dim, mv_pxspacing, winsorizor, SyN_thresh)
+  vars = Vector{Regvars}(undef, length(movingfns))
+  for i in eachindex(vars)
+    fixed2d_fn = string(outdir, "fixed2d_", slices[i], ".nrrd")
+    annotation2d_fn = string(outdir, "annotation2d_", slices[i],".nrrd") #save filename
+    moving2d_fn = outdir*first(splitext(last(splitdir(movingfns[i]))))*string("_c", channel, ".nrrd")
+    warpoutfn = replace(moving2d_fn, string("_c", channel, ".nrrd") => "_warped.nrrd")
+    tag = string(first(splitext(moving2d_fn)), "_")  #output tag
+    vars[i] = Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpoutfn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh)
+  end
+  return(vars)
+end
+
+"""file name is `regvars_idx.jld2`, where `idx` is a two-digit number. e.g. regvars_01.jld2"""
+function save_regvars(outdir, var, idx)
+  jldsave(outdir*"regvars_"*lpad(idx, 2, "0")*".jld2", regvars = var)
+end
+
+function runAntsRegistrationSyN(var::Regvars)
+  run(runAntsRegistration_01(var.dim, var.tag, var.fixed2d_fn, var.moving2d_fn; winsorizor = var.winsorizor, SyN_thresh = var.SyN_thresh)) #my default is winsorizor = (0.01, 0.99)
+end
+function runAntsRegistrationAffine(var::Regvars)
+  run(runAntsTransform_01(var.warpedfn, var.fixed2d_fn, var.moving2d_fn, var.tform1_fn)) # only rigid and affine
+end
+function runAntsTransformSyN(var::Regvars)
+  run(runAntsTransform_01(var.warpedfn, var.dim, var.fixed2d_fn, var.moving2d_fn, var.tform2_fn, var.tform1_fn)) #rigid, affine, and SyN 
+end
+function runAntsTransformInvFixedSyN(var::Regvars)
+  run(runAntsTransform_inv(var.fixedinvfn, var.dim, var.moving2d_fn, var.fixed2d_fn, var.tform2_fn, var.tform1_fn)) # inverse transformation of fixed image
+end
+function runAntsTransformInvAttnSyN(var::Regvars)
+  run(runAntsTransform_inv(var.attninvfn, var.dim, var.moving2d_fn, var.annotation2d_fn, var.tform2_fn, var.tform1_fn)) #inverse transformation of annotation
+end
+
+function overlay_boundary(var::Regvars, clim)
+  img = load(var.warpedfn)
+  attnimg = load(var.annotation2d_fn)
+  boundaryimg = overlay_boundary(img, attnimg, clim)
+  return(boundaryimg)
+end
+
+function overlay_boundary(img, attnimg, clim)
+  tmp = annotation_boundary(attnimg)
+  scalefun = scaleminmax(clim) #contrast
+  boundaryimg = scalefun.(img)
+  boundaryimg[tmp .== 1] .= 1
+  return(boundaryimg)
+end
+
+function overlay_boundary(vars::Vector{Regvars}, clim)
+  boundaryimgs = Vector{Matrix}(undef, length(vars));
+  for i in eachindex(boundaryimgs)
+    boundaryimgs[i] = overlay_boundary(vars[i], clim)
+  end
+  return(cat(boundaryimgs..., dims = 3))
+end
+
+function applyAntsTransform(var; antsTransformFunc = runAntsTransform_01)
+  applyAntsTransforms_01(var.warpoutfn, var.dim, var.fixed2d_fn, var.moving2d_fn, var.tform2_fn, var.tform1_fn, var.mv_pxspacing; antsTransformFunc = runAntsTransform_01)
+end
+
 """
 Apply transform to all channels of an image.
 This function will load a 3d tif image (potentially multi channel 2d image), convert it into nrrd, temporarily store it in `/tmp`, apply the same transform to all frames, save the transformed image in `/tmp`, 
