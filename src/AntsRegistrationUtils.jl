@@ -1,6 +1,6 @@
 module AntsRegistrationUtils
 
-using AxisArrays, Unitful, Images, BrainAnnotationMapping
+using AxisArrays, Unitful, Images, BrainAnnotationMapping, JLD2
 const μm = u"μm"
 
 export setAxis, applyAntsTransforms_01, runAntsRegistration_01, runAntsTransform_01, runAntsTransform_inv, padOrigin, Regvars, assign_regvars, save_regvars, runAntsRegistrationSyN, runAntsRegistrationAffine, runAntsTransformSyN, runAntsTransformInvFixedSyN, runAntsTransformInvAttnSyN, overlay_boundary, applyAntsTransform
