@@ -58,26 +58,37 @@ end
 function save_regvars(var)
   jldsave(var.regvars_fn, regvars = var)
 end
+save_regvars(vars::AbstractVector) = [save_regvars(var) for var in vars]
 
 function runAntsRegistrationSyN(var::Regvars)
   run(runAntsRegistration_01(var.dim, var.tag, var.fixed2d_fn, var.moving2d_fn; winsorizor = var.winsorizor, SyN_thresh = var.SyN_thresh)) #my default is winsorizor = (0.01, 0.99)
 end
+runAntsRegistrationSyN(vars::AbstractVector) = [runAntsRegistrationSyN(var) for var in vars]
+
 function runAntsRegistrationAffine(var::Regvars)
   run(runAntsTransform_01(var.warpedfn, var.fixed2d_fn, var.moving2d_fn, var.tform1_fn)) # only rigid and affine
 end
+runAntsRegistrationAffine(vars::AbstractVector) = [runAntsRegistrationAffine(var) for var in vars]
+
 function runAntsTransformSyN(var::Regvars)
   run(runAntsTransform_01(var.warpedfn, var.dim, var.fixed2d_fn, var.moving2d_fn, var.tform2_fn, var.tform1_fn)) #rigid, affine, and SyN 
 end
+runAntsTransformSyN(vars::AbstractVector) = [runAntsTransformSyN(var) for var in vars]
+
 function runAntsTransformInvFixedSyN(var::Regvars)
   run(runAntsTransform_inv(var.fixedinvfn, var.dim, var.moving2d_fn, var.fixed2d_fn, var.tform2_fn, var.tform1_fn)) # inverse transformation of fixed image
 end
+runAntsTransformInvFixedSyN(vars::AbstractVector) = [runAntsTransformInvFixedSyN(var) for var in vars]
+
 function runAntsTransformInvAttnSyN(var::Regvars)
   run(runAntsTransform_inv(var.attninvfn, var.dim, var.moving2d_fn, var.annotation2d_fn, var.tform2_fn, var.tform1_fn)) #inverse transformation of annotation
 end
+runAntsTransformInvAttnSyN(vars::AbstractVector) = [runAntsTransformInvAttnSyN(var) for var in vars]
 
 function applyAntsTransform(var; antsTransformFunc = runAntsTransform_01)
   applyAntsTransforms_01(var.warpoutfn, var.dim, var.fixed2d_fn, var.moving2d_fn, var.tform2_fn, var.tform1_fn, var.mv_pxspacing; antsTransformFunc = runAntsTransform_01)
 end
+applyAntsTransform(vars::AbstractVector; antsTransformFunc = runAntsTransform_01) = [applyAntsTransform(var) for var in vars]
 
 """
 Apply transform to all channels of an image.
