@@ -25,6 +25,18 @@ Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpout, regvars_fn, tag, dim,
   string(tag, "fixedinv.nrrd"),
   string(tag, "attninv.nrrd"))
 
+## visualize moving images
+function pad_images(vector_of_images; h = :auto, w = :auto)
+  if h == :auto
+    h = max([size(vector_of_images[i],1) for i in eachindex(vector_of_images)]...)
+  end
+  if w == :auto
+    w = max([size(vector_of_images[i],2) for i in eachindex(vector_of_images)]...)
+  end
+  paddedimages= [PaddedView(0, vector_of_images[i], (h, w), padOrigin((h, w), vector_of_images[i])) for i in eachindex(vector_of_images)]
+  return(paddedimages)
+end
+
 
 ## assign input and output file names 
 function assign_regvars(outdir, movingfns, slices, channel, dim, mv_pxspacing, winsorizor, SyN_thresh)
@@ -61,29 +73,6 @@ function runAntsTransformInvFixedSyN(var::Regvars)
 end
 function runAntsTransformInvAttnSyN(var::Regvars)
   run(runAntsTransform_inv(var.attninvfn, var.dim, var.moving2d_fn, var.annotation2d_fn, var.tform2_fn, var.tform1_fn)) #inverse transformation of annotation
-end
-
-function overlay_boundary(var::Regvars, clim)
-  img = load(var.warpedfn)
-  attnimg = load(var.annotation2d_fn)
-  boundaryimg = overlay_boundary(img, attnimg, clim)
-  return(boundaryimg)
-end
-
-function overlay_boundary(img, attnimg, clim)
-  tmp = annotation_boundary(attnimg)
-  scalefun = scaleminmax(clim...) #contrast
-  boundaryimg = scalefun.(img)
-  boundaryimg[tmp .== 1] .= 1
-  return(boundaryimg)
-end
-
-function overlay_boundary(vars::Vector{Regvars}, clim)
-  boundaryimgs = Vector{Matrix}(undef, length(vars));
-  for i in eachindex(boundaryimgs)
-    boundaryimgs[i] = overlay_boundary(vars[i], clim)
-  end
-  return(cat(boundaryimgs..., dims = 3))
 end
 
 function applyAntsTransform(var; antsTransformFunc = runAntsTransform_01)
