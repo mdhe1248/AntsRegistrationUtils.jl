@@ -34,7 +34,8 @@ function assign_regvars(outdir, movingfns, slices, channel, dim, mv_pxspacing, w
     annotation2d_fn = string(outdir, "annotation2d_", slices[i],".nrrd") #save filename
     moving2d_fn = outdir*first(splitext(last(splitdir(movingfns[i]))))*string("_c", channel, ".nrrd")
     warpoutfn = replace(moving2d_fn, string("_c", channel, ".nrrd") => "_warped.nrrd")
-    regvars_fn = outdir*"regvars_"*lpad(i, 2, "0")*".jld2"
+    n = first(splitext(last(splitdir(movingfns[i]))))[end-1:end]
+    regvars_fn = outdir*"regvars_"*n*".jld2"
     tag = string(first(splitext(moving2d_fn)), "_")  #output tag
     vars[i] = Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpoutfn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh)
   end
