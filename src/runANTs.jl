@@ -3,6 +3,7 @@ mutable struct Regvars
   annotation2d_fn::String
   moving2d_fn::String
   warpoutfn::String #all channel
+  regvars_fn::String
   tag::String
   dim::Int
   mv_pxspacing::NTuple{2, Number}
@@ -15,8 +16,8 @@ mutable struct Regvars
   fixedinvfn::String
   attninvfn::String
 end
-Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpout, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
-) = Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpout, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
+Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpout, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
+) = Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpout, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
   string(tag, "1InverseWarp.nii.gz"),
   string(tag, "0GenericAffine.mat"),
   string(tag, "1Warp.nii.gz"),
@@ -33,15 +34,16 @@ function assign_regvars(outdir, movingfns, slices, channel, dim, mv_pxspacing, w
     annotation2d_fn = string(outdir, "annotation2d_", slices[i],".nrrd") #save filename
     moving2d_fn = outdir*first(splitext(last(splitdir(movingfns[i]))))*string("_c", channel, ".nrrd")
     warpoutfn = replace(moving2d_fn, string("_c", channel, ".nrrd") => "_warped.nrrd")
+    regvars_fn = outdir*"regvars_"*lpad(i, 2, "0")*".jld2"
     tag = string(first(splitext(moving2d_fn)), "_")  #output tag
-    vars[i] = Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpoutfn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh)
+    vars[i] = Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpoutfn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh)
   end
   return(vars)
 end
 
 """file name is `regvars_idx.jld2`, where `idx` is a two-digit number. e.g. regvars_01.jld2"""
-function save_regvars(outdir, var, idx)
-  jldsave(outdir*"regvars_"*lpad(idx, 2, "0")*".jld2", regvars = var)
+function save_regvars(var)
+  jldsave(var.regvars_fn, regvars = var)
 end
 
 function runAntsRegistrationSyN(var::Regvars)
