@@ -50,8 +50,6 @@ end
 
 
 ## assign input and output file names 
-function assign_regvars(outdir, movingfn, fixed_slice, bg_channel, dim, mv_pxspacing, winsorizor, SyN_thresh)
-
 function assign_regvars(outdir, movingfns, slices, channel, dim, mv_pxspacing, winsorizor, SyN_thresh)
   vars = Vector{Regvars}(undef, length(movingfns))
   for i in eachindex(vars)
