@@ -88,7 +88,7 @@ runAntsTransformInvAttnSyN(vars::AbstractVector) = [runAntsTransformInvAttnSyN(v
 function applyAntsTransform(var; antsTransformFunc = runAntsTransform_01)
   applyAntsTransforms_01(var.warpoutfn, var.dim, var.fixed2d_fn, var.moving2d_fn, var.tform2_fn, var.tform1_fn, var.mv_pxspacing; antsTransformFunc = runAntsTransform_01)
 end
-applyAntsTransform(vars::AbstractVector; antsTransformFunc = runAntsTransform_01) = [applyAntsTransform(var) for var in vars]
+applyAntsTransform(vars::AbstractVector; antsTransformFunc = runAntsTransform_01) = [applyAntsTransform(var; antsTransformFunc = runAntsTransform_01) for var in vars]
 
 """
 Apply transform to all channels of an image.
