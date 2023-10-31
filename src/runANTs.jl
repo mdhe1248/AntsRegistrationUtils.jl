@@ -35,7 +35,6 @@ Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor
   string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "fixedinv.nrrd"),
   string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "attninv.nrrd"))
 
-#Regvars(outdir, movingfn, bg_channel, fixed_slice, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
 ## visualize moving images
 function pad_images(vector_of_images; h = :auto, w = :auto)
   if h == :auto
@@ -48,22 +47,6 @@ function pad_images(vector_of_images; h = :auto, w = :auto)
   return(paddedimages)
 end
 
-
-## assign input and output file names 
-function assign_regvars(outdir, movingfns, slices, channel, dim, mv_pxspacing, winsorizor, SyN_thresh)
-  vars = Vector{Regvars}(undef, length(movingfns))
-  for i in eachindex(vars)
-    fixed2d_fn = string(outdir, "fixed2d_", slices[i], ".nrrd")
-    annotation2d_fn = string(outdir, "annotation2d_", slices[i],".nrrd") #save filename
-    moving2d_fn = outdir*first(splitext(last(splitdir(movingfns[i]))))*string("_c", channel, ".nrrd")
-    warpoutfn = replace(moving2d_fn, string("_c", channel, ".nrrd") => "_warped.nrrd")
-    n = first(splitext(last(splitdir(movingfns[i]))))[end-1:end]
-    regvars_fn = outdir*"regvars_"*n*".jld2"
-    tag = string(first(splitext(moving2d_fn)), "_")  #output tag
-    vars[i] = Regvars(outdir, movingfns[i], fixed2d_fn, annotation2d_fn, moving2d_fn, warpoutfn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh)
-  end
-  return(vars)
-end
 
 """file name is `regvars_idx.jld2`, where `idx` is a two-digit number. e.g. regvars_01.jld2"""
 function save_regvars(var)
@@ -97,7 +80,7 @@ end
 runAntsTransformInvAttnSyN(vars::AbstractVector) = [runAntsTransformInvAttnSyN(var) for var in vars]
 
 function applyAntsTransform(var; antsTransformFunc = runAntsTransform_01)
-  applyAntsTransforms_01(var.warpoutfn, var.dim, var.fixed2d_fn, var.moving2d_fn, var.tform2_fn, var.tform1_fn, var.mv_pxspacing; antsTransformFunc = runAntsTransform_01)
+  applyAntsTransforms_01(var.warpout_fn, var.dim, var.fixed2d_fn, var.moving2d_fn, var.tform2_fn, var.tform1_fn, var.mv_pxspacing; antsTransformFunc = runAntsTransform_01)
 end
 applyAntsTransform(vars::AbstractVector; antsTransformFunc = runAntsTransform_01) = [applyAntsTransform(var; antsTransformFunc = runAntsTransform_01) for var in vars]
 
@@ -105,7 +88,7 @@ applyAntsTransform(vars::AbstractVector; antsTransformFunc = runAntsTransform_01
 Apply transform to all channels of an image.
 This function will load a 3d tif image (potentially multi channel 2d image), convert it into nrrd, temporarily store it in `/tmp`, apply the same transform to all frames, save the transformed image in `/tmp`, 
 """
-function applyAntsTransforms_01(warpoutfn::String, d::Int, fixedfn::String, movingfn::String, tform2_fn::String, tform1_fn::String, mv_pxspacing; antsTransformFunc)
+function applyAntsTransforms_01(warpout_fn::String, d::Int, fixedfn::String, movingfn::String, tform2_fn::String, tform1_fn::String, mv_pxspacing; antsTransformFunc)
   img = load(movingfn)
   nimgs = size(img, 3) #find the number of channels
   tmp = Vector{AbstractMatrix}();
@@ -120,7 +103,7 @@ function applyAntsTransforms_01(warpoutfn::String, d::Int, fixedfn::String, movi
     rm(outfn)
   end
   tmpm = reshape( reduce(hcat, tmp), size(tmp[1],1), size(tmp[1],2), :)
-  save(warpoutfn, tmpm)
+  save(warpout_fn, tmpm)
 end
 
 """Registration function
