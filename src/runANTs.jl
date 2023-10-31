@@ -3,7 +3,6 @@ mutable struct Regvars
   movingfn::String
   bg_channel::Number
   fixed_slice::Number
-  tag::String
   dim::Int
   mv_pxspacing::NTuple{2, Number}
   winsorizor::NTuple{2, Float64}
@@ -13,6 +12,7 @@ mutable struct Regvars
   moving2d_fn::String
   warpout_fn::String #all channel
   regvars_fn::String
+  tag::String
   inverse_warp_fn::String
   tform1_fn::String
   tform2_fn::String
@@ -20,13 +20,13 @@ mutable struct Regvars
   fixedinvfn::String
   attninvfn::String
 end
-Regvars(outdir, movingfn, bg_channel, fixed_slice, tag, dim, mv_pxspacing, winsorizor, SyN_thresh) = 
-Regvars(outdir, movingfn, bg_channel, fixed_slice, tag, dim, mv_pxspacing, winsorizor, SyN_thresh, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn,
-  string(outdir, "fixed2d_", slice, ".nrrd"),
-  string(outdir, "annotation2d_", slice,".nrrd"),
-  outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"),
-  replace(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), string("_c", bg_channel, ".nrrd") => "_warped.nrrd"),
-  outdir*"regvars_"*first(splitext(last(splitdir(movingfn))))[end-1:end]*".jld2",
+Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor, SyN_thresh) = 
+Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor, SyN_thresh, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn,
+  string(outdir, "fixed2d_", slice, ".nrrd"), #fixed2d_fn
+  string(outdir, "annotation2d_", slice,".nrrd"), #annotation_fn
+  outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), #moving2d_fn
+  replace(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), string("_c", bg_channel, ".nrrd") => "_warped.nrrd"), #warpout_fn
+  outdir*"regvars_"*first(splitext(last(splitdir(movingfn))))[end-1:end]*".jld2", #regvar fn
   string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"),  #output tag
   string(tag, "1InverseWarp.nii.gz"),
   string(tag, "0GenericAffine.mat"),
