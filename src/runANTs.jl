@@ -21,7 +21,7 @@ mutable struct Regvars
   attninvfn::String
 end
 Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor, SyN_thresh) = 
-Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor, SyN_thresh, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn,
+Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor, SyN_thresh,
   string(outdir, "fixed2d_", slice, ".nrrd"), #fixed2d_fn
   string(outdir, "annotation2d_", slice,".nrrd"), #annotation_fn
   outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), #moving2d_fn
