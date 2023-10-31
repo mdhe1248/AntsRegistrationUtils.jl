@@ -1,8 +1,12 @@
 mutable struct Regvars
+  outdir::String
+  movingfn::String
+  bg_channel::Number
+  fixed_slice::Number
   fixed2d_fn::String
   annotation2d_fn::String
   moving2d_fn::String
-  warpoutfn::String #all channel
+  warpout_fn::String #all channel
   regvars_fn::String
   tag::String
   dim::Int
@@ -16,8 +20,14 @@ mutable struct Regvars
   fixedinvfn::String
   attninvfn::String
 end
-Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpout, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
-) = Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpout, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
+Regvars(outdir, movingfn, bg_channel, fixed_slice, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
+) = Regvars(outdir, movingfn, bg_channel, fixed_slice, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
+  string(outdir, "fixed2d_", slice, ".nrrd"),
+  string(outdir, "annotation2d_", slice,".nrrd"),
+  outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"),
+  replace(moving2d_fn, string("_c", bg_channel, ".nrrd") => "_warped.nrrd"),
+  outdir*"regvars_"*first(splitext(last(splitdir(movingfn))))[end-1:end]*".jld2",
+  string(first(splitext(moving2d_fn)), "_"),  #output tag
   string(tag, "1InverseWarp.nii.gz"),
   string(tag, "0GenericAffine.mat"),
   string(tag, "1Warp.nii.gz"),
@@ -49,7 +59,7 @@ function assign_regvars(outdir, movingfns, slices, channel, dim, mv_pxspacing, w
     n = first(splitext(last(splitdir(movingfns[i]))))[end-1:end]
     regvars_fn = outdir*"regvars_"*n*".jld2"
     tag = string(first(splitext(moving2d_fn)), "_")  #output tag
-    vars[i] = Regvars(fixed2d_fn, annotation2d_fn, moving2d_fn, warpoutfn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh)
+    vars[i] = Regvars(outdir, movingfns[i], fixed2d_fn, annotation2d_fn, moving2d_fn, warpoutfn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh)
   end
   return(vars)
 end
