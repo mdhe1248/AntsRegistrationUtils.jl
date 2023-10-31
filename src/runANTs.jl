@@ -28,12 +28,12 @@ Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor
   replace(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), string("_c", bg_channel, ".nrrd") => "_warped.nrrd"), #warpout_fn
   outdir*"regvars_"*first(splitext(last(splitdir(movingfn))))[end-1:end]*".jld2", #regvar fn
   string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"),  #output tag
-  string(tag, "1InverseWarp.nii.gz"),
-  string(tag, "0GenericAffine.mat"),
-  string(tag, "1Warp.nii.gz"),
-  string(tag, "warped.nrrd"),
-  string(tag, "fixedinv.nrrd"),
-  string(tag, "attninv.nrrd"))
+  string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "1InverseWarp.nii.gz"),
+  string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "0GenericAffine.mat"),
+  string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "1Warp.nii.gz"),
+  string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "warped.nrrd"),
+  string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "fixedinv.nrrd"),
+  string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "attninv.nrrd"))
 
 #Regvars(outdir, movingfn, bg_channel, fixed_slice, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
 ## visualize moving images
