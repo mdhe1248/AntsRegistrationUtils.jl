@@ -3,16 +3,16 @@ mutable struct Regvars
   movingfn::String
   bg_channel::Number
   fixed_slice::Number
-  fixed2d_fn::String
-  annotation2d_fn::String
-  moving2d_fn::String
-  warpout_fn::String #all channel
-  regvars_fn::String
   tag::String
   dim::Int
   mv_pxspacing::NTuple{2, Number}
   winsorizor::NTuple{2, Float64}
   SyN_thresh::Float64
+  fixed2d_fn::String
+  annotation2d_fn::String
+  moving2d_fn::String
+  warpout_fn::String #all channel
+  regvars_fn::String
   inverse_warp_fn::String
   tform1_fn::String
   tform2_fn::String
@@ -20,14 +20,14 @@ mutable struct Regvars
   fixedinvfn::String
   attninvfn::String
 end
-Regvars(outdir, movingfn, bg_channel, fixed_slice, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
-) = Regvars(outdir, movingfn, bg_channel, fixed_slice, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
+Regvars(outdir, movingfn, bg_channel, fixed_slice, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
+) = Regvars(outdir, movingfn, bg_channel, fixed_slice, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn,
   string(outdir, "fixed2d_", slice, ".nrrd"),
   string(outdir, "annotation2d_", slice,".nrrd"),
   outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"),
-  replace(moving2d_fn, string("_c", bg_channel, ".nrrd") => "_warped.nrrd"),
+  replace(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), string("_c", bg_channel, ".nrrd") => "_warped.nrrd"),
   outdir*"regvars_"*first(splitext(last(splitdir(movingfn))))[end-1:end]*".jld2",
-  string(first(splitext(moving2d_fn)), "_"),  #output tag
+  string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"),  #output tag
   string(tag, "1InverseWarp.nii.gz"),
   string(tag, "0GenericAffine.mat"),
   string(tag, "1Warp.nii.gz"),
@@ -35,6 +35,7 @@ Regvars(outdir, movingfn, bg_channel, fixed_slice, fixed2d_fn, annotation2d_fn, 
   string(tag, "fixedinv.nrrd"),
   string(tag, "attninv.nrrd"))
 
+#Regvars(outdir, movingfn, bg_channel, fixed_slice, fixed2d_fn, annotation2d_fn, moving2d_fn, warpout_fn, regvars_fn, tag, dim, mv_pxspacing, winsorizor, SyN_thresh,
 ## visualize moving images
 function pad_images(vector_of_images; h = :auto, w = :auto)
   if h == :auto
@@ -49,6 +50,8 @@ end
 
 
 ## assign input and output file names 
+function assign_regvars(outdir, movingfn, fixed_slice, bg_channel, dim, mv_pxspacing, winsorizor, SyN_thresh)
+
 function assign_regvars(outdir, movingfns, slices, channel, dim, mv_pxspacing, winsorizor, SyN_thresh)
   vars = Vector{Regvars}(undef, length(movingfns))
   for i in eachindex(vars)
