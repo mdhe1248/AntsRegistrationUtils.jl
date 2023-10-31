@@ -22,8 +22,8 @@ mutable struct Regvars
 end
 Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor, SyN_thresh) = 
 Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor, SyN_thresh,
-  string(outdir, "fixed2d_", slice, ".nrrd"), #fixed2d_fn
-  string(outdir, "annotation2d_", slice,".nrrd"), #annotation_fn
+  string(outdir, "fixed2d_", fixed_slice, ".nrrd"), #fixed2d_fn
+  string(outdir, "annotation2d_", fixed_slice,".nrrd"), #annotation_fn
   outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), #moving2d_fn
   replace(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), string("_c", bg_channel, ".nrrd") => "_warped.nrrd"), #warpout_fn
   outdir*"regvars_"*first(splitext(last(splitdir(movingfn))))[end-1:end]*".jld2", #regvar fn
