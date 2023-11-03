@@ -50,8 +50,7 @@ function save_image_arranged(imgvar::ImageVar)
   moving = load(imgvar.movingfn_midres)
   moving = horizontal_flip(moving, flipped)
   if flipped
-    rm(moving_midres_savefn) # For overwriting. Somehow, `save` does not overwrite symbolic link files.
-    save(moving_midres_savefn, moving)
+    isfile(moving_midres_savefn) ? rm(moving_midres_savefn) : save(moving_midres_savefn, moving) # For overwriting. Somehow, `save` does not overwrite symbolic link files.
   else
     tmpfn = last(splitdir(movingfn_midres)) # for relative path symbolic link
     run(`ln -sf $tmpfn $(moving_midres_savefn)`) #if there is no change, just make a symbolic link
