@@ -48,11 +48,13 @@ function save_image_arranged(imgvar::ImageVar)
   mv_pxspacing_lowres = imgvar.mv_pxspacing_lowres
   flipped = imgvar.flipped
   moving = load(imgvar.movingfn_midres)
-  moving = horizontal_flip(moving, flipped) 
-  if flipped 
+  moving = horizontal_flip(moving, flipped)
+  if flipped
+    rm(moving_midres_savefn) # For overwriting. Somehow, `save` does not overwrite symbolic link files.
     save(moving_midres_savefn, moving)
   else
-    run(`ln -sf $movingfn_midres $(moving_midres_savefn)`) #if there is no change, just make a symbolic link
+    tmpfn = last(splitdir(movingfn_midres)) # for relative path symbolic link
+    run(`ln -sf $tmpfn $(moving_midres_savefn)`) #if there is no change, just make a symbolic link
   end
   moving_low = imresize(moving, ratio = (mv_pxspacing_midres./mv_pxspacing_lowres..., 1))
   save(moving_lowres_savefn, moving_low) #save low resolution image
