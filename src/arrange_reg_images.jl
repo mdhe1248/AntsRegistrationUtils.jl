@@ -35,7 +35,7 @@ function assign_imagevars(bg_channel, movingfns_midres, moving_midres_savefns, m
 end
 
 function set_flips(length_flips, flipidx)
-  flips = falses(length_flipis)
+  flips = falses(length_flips)
   flips[flipidx] .= true
   flips
 end
