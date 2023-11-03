@@ -34,8 +34,8 @@ function assign_imagevars(bg_channel, movingfns_midres, moving_midres_savefns, m
   return [ImageVar(bg_channel, vars[1], vars[2], vars[3], mv_pxspacing_midres, mv_pxspacing_lowres, vars[4], vars[5]) for vars in zip(movingfns_midres, moving_midres_savefns, moving_lowres_savefns, slice_orders, flips)]
 end
 
-function set_flips(flipidx)
-  flips = falses(length(movingfns_midres))
+function set_flips(length_flips, flipidx)
+  flips = falses(length_flipis)
   flips[flipidx] .= true
   flips
 end
