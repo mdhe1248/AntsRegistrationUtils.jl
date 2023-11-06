@@ -35,18 +35,6 @@ Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor
   string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "fixedinv.nrrd"),
   string(string(first(splitext(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"))), "_"), "attninv.nrrd"))
 
-## visualize moving images
-function pad_images(vector_of_images; h = :auto, w = :auto)
-  if h == :auto
-    h = max([size(vector_of_images[i],1) for i in eachindex(vector_of_images)]...)
-  end
-  if w == :auto
-    w = max([size(vector_of_images[i],2) for i in eachindex(vector_of_images)]...)
-  end
-  paddedimages= [PaddedView(0, vector_of_images[i], (h, w), padOrigin((h, w), vector_of_images[i])) for i in eachindex(vector_of_images)]
-  return(paddedimages)
-end
-
 
 """file name is `regvars_idx.jld2`, where `idx` is a two-digit number. e.g. regvars_01.jld2"""
 function save_regvars(var)
@@ -142,11 +130,6 @@ runAntsTransform_inv(imgw_outname, d, f, m, tform1) = `antsApplyTransforms -d $d
 runAntsTransform_inv(imgw_outname, d, f, m, inv_tform2, tform1) = `antsApplyTransforms -d $d -i $m -r $f -o $imgw_outname -n Linear -t $inv_tform2 -t \[$tform1, 1\] -v`
 
 
-""" find an origin to put the image `A` in the center of PaddedView. v is a 2-element vector"""
-function padOrigin(v, A)
-  r, c = (ceil(Int, (v[1]-size(A,1))/2)+1, ceil(Int, (v[2]-size(A,2))/2)+1)
-  return(r, c)
-end
 #"""
 #My default registration parameters:
 #
