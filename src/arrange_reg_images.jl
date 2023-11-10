@@ -27,7 +27,7 @@ function horizontal_flip(img::AbstractArray{T, 3}, flip::Bool) where T
 end
 
 function assign_imagevars(bg_channel, movingfns_midres, moving_midres_savefns, moving_lowres_savefns, mv_pxspacing_midres, mv_pxspacing_lowres, slice_orders, flips)
-  movingfns_midres = movingfns_midres[slice_orders]
+ # movingfns_midres = movingfns_midres[slice_orders]
   moving_midres_savefns = moving_midres_savefns[slice_orders]
   moving_lowres_savefns = moving_lowres_savefns[slice_orders]
   flips = flips[slice_orders]
