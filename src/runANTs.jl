@@ -2,7 +2,7 @@ mutable struct Regvars
   outdir::String
   movingfn::String
   bg_channel::Number
-  fixed_slice::Number
+  fixed_index::Union{Number, String}
   dim::Int
   mv_pxspacing::NTuple{2, Number}
   winsorizor::NTuple{2, Float64}
@@ -20,10 +20,10 @@ mutable struct Regvars
   fixedinvfn::String
   attninvfn::String
 end
-Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor, SyN_thresh) = 
-Regvars(outdir, movingfn, bg_channel, fixed_slice, dim, mv_pxspacing, winsorizor, SyN_thresh,
-  string(outdir, "fixed2d_", fixed_slice, ".nrrd"), #fixed2d_fn
-  string(outdir, "annotation2d_", fixed_slice,".nrrd"), #annotation_fn
+Regvars(outdir, movingfn, bg_channel, fixed_index, dim, mv_pxspacing, winsorizor, SyN_thresh) = 
+Regvars(outdir, movingfn, bg_channel, fixed_index, dim, mv_pxspacing, winsorizor, SyN_thresh,
+  string(outdir, "fixed2d_", fixed_index, ".nrrd"), #fixed2d_fn
+  string(outdir, "annotation2d_", fixed_index,".nrrd"), #annotation_fn
   outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), #moving2d_fn
   replace(outdir*first(splitext(last(splitdir(movingfn))))*string("_c", bg_channel, ".nrrd"), string("_c", bg_channel, ".nrrd") => "_warped.nrrd"), #warpout_fn
   outdir*"regvars_"*first(splitext(last(splitdir(movingfn))))[end-1:end]*".jld2", #regvar fn
